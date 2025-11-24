@@ -41,6 +41,6 @@ build: |
   echo -e "---构建结束---\n"
 sources:
 - kind: file
-  url: https://downloads.vivaldi.com/stable/vivaldi-stable_7.7.3851.52-1_amd64.deb
-  digest: 75f28318f0a48dbc394b2c505f0a256e36e6f95017b0b9ce9423125687b11657
+  url: https://github.com/linglongdev/com.vivaldi.vivaldi/releases/download/v7.7.3851.52/vivaldi-stable_7.7.3851.52-1_arm64.deb
+  digest: 696c5c91ed32afcc73cfaf46fcf8e410d3ae6748e19ada078396cdae8da34864
   name: vivaldi.deb
