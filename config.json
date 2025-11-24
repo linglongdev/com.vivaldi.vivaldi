@@ -1,0 +1,6 @@
+{
+  "app_name": "Vivaldi",
+  "version_url": "https://vivaldi.com/download/",
+  "version_pattern": "(\\d+\\.\\d+\\.\\d+\\.\\d+)",
+  "download_url_template": "https://downloads.vivaldi.com/stable/vivaldi-stable_{version}-1_{arch}.deb"
+}

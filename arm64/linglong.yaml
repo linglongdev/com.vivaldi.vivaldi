@@ -1,0 +1,46 @@
+version: '1'
+package:
+  id: com.vivaldi.vivaldi
+  name: Vivaldi
+  version: 7.7.3851.52
+  kind: app
+  description: 'Vivaldi浏览器
+
+    '
+command:
+- /opt/apps/com.vivaldi.vivaldi/files/vivaldi
+base: org.deepin.base/25.2.1
+build: |
+  echo -e "\n---开始构建---"
+  srcdir=/project/linglong/sources
+  appdir=file_unpack/opt/*
+  cd $srcdir
+  rm -rf file_unpack
+  # 需手动编辑
+  dpkg -x ./vivaldi.deb file_unpack
+  echo "1.解包deb完成"
+  cd $srcdir/$appdir
+  if [ -d "share" ]; then echo "(已有share目录,继续)"; else mkdir share; fi
+  mv -f $srcdir/file_unpack/usr/share/* ./share/
+  cd ./share/applications
+  sed -i "s|Exec=/usr/bin/vivaldi-stable|Exec=/opt/apps/com.vivaldi.vivaldi/files/vivaldi|g" vivaldi-stable.desktop
+  sed -i "109a\StartupWMClass=vivaldi-stable" vivaldi-stable.desktop
+  mv vivaldi-stable.desktop ${LINGLONG_APPID}.desktop
+  echo "2.程序文件整理完成"
+  rm -rf $PREFIX/*
+  cp -rf $srcdir/$appdir/* $PREFIX/
+  install -D $srcdir/$appdir/product_logo_16.png $PREFIX/share/icons/hicolor/16x16/apps/vivaldi.png
+  install -D $srcdir/$appdir/product_logo_22.png $PREFIX/share/icons/hicolor/22x22/apps/vivaldi.png
+  install -D $srcdir/$appdir/product_logo_24.png $PREFIX/share/icons/hicolor/24x24/apps/vivaldi.png
+  install -D $srcdir/$appdir/product_logo_32.png $PREFIX/share/icons/hicolor/32x32/apps/vivaldi.png
+  install -D $srcdir/$appdir/product_logo_48.png $PREFIX/share/icons/hicolor/48x48/apps/vivaldi.png
+  install -D $srcdir/$appdir/product_logo_64.png $PREFIX/share/icons/hicolor/64x64/apps/vivaldi.png
+  install -D $srcdir/$appdir/product_logo_128.png $PREFIX/share/icons/hicolor/128x128/apps/vivaldi.png
+  install -D $srcdir/$appdir/product_logo_256.png $PREFIX/share/icons/hicolor/256x256/apps/vivaldi.png
+  echo "3.程序文件释放完成"
+  echo -e "---构建结束---\n"
+sources:
+- kind: file
+  url: https://downloads.vivaldi.com/stable/vivaldi-stable_7.7.3851.52-1_amd64.deb
+  digest: 75f28318f0a48dbc394b2c505f0a256e36e6f95017b0b9ce9423125687b11657
+  name: vivaldi.deb

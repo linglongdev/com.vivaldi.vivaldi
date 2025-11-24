@@ -1,0 +1,43 @@
+name: Check for Updates (Python)
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  check-updates:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Python dependencies
+        run: |
+          pip install pyyaml
+
+      - name: Run Python update checker
+        id: check_updates
+        run: |
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+
+          # 运行更新检查器，只有在有更新时脚本才会输出has_changes=true
+          python3 .github/scripts/update_checker.py config.json
+
+      - name: Commit and push if changes
+        if: steps.check_updates.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add linglong.yaml arm64/linglong.yaml
+          git commit -m "chore: update Sublime Text to latest version"
+          git push
