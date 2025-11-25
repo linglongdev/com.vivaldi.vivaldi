@@ -2,12 +2,15 @@ name: Check for Updates (Python)
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: '0 0 * * *'
   workflow_dispatch: # 允许手动触发
 
 jobs:
   check-updates:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout repository
@@ -29,8 +32,75 @@ jobs:
         id: check_updates
         run: |
           echo "has_changes=false" >> $GITHUB_OUTPUT
+          echo "new_version=" >> $GITHUB_OUTPUT
+          echo "download_url=" >> $GITHUB_OUTPUT
 
-          # 运行更新检查器，只有在有更新时脚本才会输出has_changes=true
+          # 运行更新检查器，获取新版本信息
+          python3 .github/scripts/update_checker.py config.json
+
+      - name: Download Vivaldi package
+        if: steps.check_updates.outputs.has_changes == 'true'
+        id: download
+        run: |
+          DOWNLOAD_URL="${{ steps.check_updates.outputs.download_url }}"
+          NEW_VERSION="${{ steps.check_updates.outputs.new_version }}"
+
+          echo "Downloading Vivaldi package from: $DOWNLOAD_URL"
+          wget -O "vivaldi-stable_${NEW_VERSION}-1_amd64.deb" "$DOWNLOAD_URL"
+
+          # 计算文件哈希
+          SHA256=$(sha256sum "vivaldi-stable_${NEW_VERSION}-1_amd64.deb" | cut -d' ' -f1)
+          echo "sha256=$SHA256" >> $GITHUB_OUTPUT
+          echo "Downloaded file SHA256: $SHA256"
+
+      - name: Create GitHub Release
+        if: steps.check_updates.outputs.has_changes == 'true'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.check_updates.outputs.new_version }}
+          release_name: Vivaldi ${{ steps.check_updates.outputs.new_version }}
+          body: |
+            Vivaldi browser version ${{ steps.check_updates.outputs.new_version }}
+
+            ## Downloads
+            - AMD64: vivaldi-stable_${{ steps.check_updates.outputs.new_version }}-1_amd64.deb
+            - ARM64: vivaldi-stable_${{ steps.check_updates.outputs.new_version }}-1_arm64.deb
+
+            ## Checksums
+            - AMD64: `${{ steps.download.outputs.sha256 }}`
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        if: steps.check_updates.outputs.has_changes == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./vivaldi-stable_${{ steps.check_updates.outputs.new_version }}-1_amd64.deb
+          asset_name: vivaldi-stable_${{ steps.check_updates.outputs.new_version }}-1_amd64.deb
+          asset_content_type: application/vnd.debian.binary-package
+
+      - name: Update YAML files with GitHub URLs
+        if: steps.check_updates.outputs.has_changes == 'true'
+        run: |
+          NEW_VERSION="${{ steps.check_updates.outputs.new_version }}"
+          REPO_OWNER="${{ github.repository_owner }}"
+          REPO_NAME="${{ github.event.repository.name }}"
+
+          # 构建GitHub release URL
+          GITHUB_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/v${NEW_VERSION}/vivaldi-stable_${NEW_VERSION}-1_amd64.deb"
+
+          echo "Updating YAML files with GitHub URL: $GITHUB_URL"
+
+          # 运行更新脚本，使用GitHub URL
+          export USE_GITHUB_URL="true"
+          export GITHUB_RELEASE_URL="$GITHUB_URL"
+          export NEW_VERSION="$NEW_VERSION"
           python3 .github/scripts/update_checker.py config.json
 
       - name: Commit and push if changes
@@ -39,5 +109,5 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add linglong.yaml arm64/linglong.yaml
-          git commit -m "chore: update Sublime Text to latest version"
+          git commit -m "chore: update Vivaldi to ${{ steps.check_updates.outputs.new_version }} with GitHub release URL"
           git push
