@@ -2,7 +2,7 @@ version: '1'
 package:
   id: com.vivaldi.vivaldi
   name: Vivaldi
-  version: 7.7.3851.52
+  version: 7.7.3851.1125
   kind: app
   description: 'Vivaldi浏览器
 
@@ -30,7 +30,6 @@ build: |
   rm -rf $PREFIX/*
   cp -rf $srcdir/$appdir/* $PREFIX/
   install -D $srcdir/$appdir/product_logo_16.png $PREFIX/share/icons/hicolor/16x16/apps/vivaldi.png
-  install -D $srcdir/$appdir/product_logo_22.png $PREFIX/share/icons/hicolor/22x22/apps/vivaldi.png
   install -D $srcdir/$appdir/product_logo_24.png $PREFIX/share/icons/hicolor/24x24/apps/vivaldi.png
   install -D $srcdir/$appdir/product_logo_32.png $PREFIX/share/icons/hicolor/32x32/apps/vivaldi.png
   install -D $srcdir/$appdir/product_logo_48.png $PREFIX/share/icons/hicolor/48x48/apps/vivaldi.png
@@ -41,6 +40,6 @@ build: |
   echo -e "---构建结束---\n"
 sources:
 - kind: file
-  url: https://github.com/linglongdev/com.vivaldi.vivaldi/releases/download/v7.7.3851.52/vivaldi-stable_7.7.3851.52-1_arm64.deb
-  digest: 696c5c91ed32afcc73cfaf46fcf8e410d3ae6748e19ada078396cdae8da34864
+  url: https://edgeone.gh-proxy.com/https://github.com/linglongdev/com.vivaldi.vivaldi/releases/download/v7.7.3851.52/vivaldi-stable_7.7.3851.52-1_arm64.deb
+  digest: b4a0457b930178e492e66902e7b7cc27e1201a98fdb16d7de923ce1883600de3
   name: vivaldi.deb
