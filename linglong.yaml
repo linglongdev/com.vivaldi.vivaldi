@@ -2,7 +2,7 @@ version: '1'
 package:
   id: com.vivaldi.vivaldi
   name: Vivaldi
-  version: 7.7.3851.1204
+  version: 7.7.3851.1211
   kind: app
   description: 'Vivaldi浏览器
 
@@ -40,6 +40,6 @@ build: |
   echo -e "---构建结束---\n"
 sources:
 - kind: file
-  url: https://edgeone.gh-proxy.com/https://github.com/linglongdev/com.vivaldi.vivaldi/releases/download/v7.7.3851.58/vivaldi-stable_7.7.3851.58-1_amd64.deb
-  digest: c35d025f78fb22ad64b612ef925ca7375ee4e80efb548924465d104f9ba2f819
+  url: https://edgeone.gh-proxy.com/https://github.com/linglongdev/com.vivaldi.vivaldi/releases/download/v7.7.3851.61/vivaldi-stable_7.7.3851.61-1_amd64.deb
+  digest: c8262c916104ebeaec2a358a6bdef26e6534e357d573cf27e2615602f47e22e6
   name: vivaldi.deb
